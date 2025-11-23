@@ -4,18 +4,19 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { toast } from "react-hot-toast";
 
-
 export default function Recordings() {
   const [recordings, setRecordings] = useState([]);
   const location = useLocation();
 
+  const BACKEND_URL = "https://screen-recorder-backend-8ujt.onrender.com";
+
   useEffect(() => {
     const fetchRecordings = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/recordings`,{
+        const res = await fetch(`${BACKEND_URL}/api/recordings`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         const data = await res.json();
         if (data.success) setRecordings(data.recordings);
@@ -32,12 +33,13 @@ export default function Recordings() {
     if (!window.confirm("Are you sure you want to delete this recording?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/recordings/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/recordings/${id}`, {
         method: "DELETE",
         headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+
       const data = await res.json();
       if (data.success) {
         setRecordings((prev) => prev.filter((rec) => rec._id !== id));
@@ -51,12 +53,15 @@ export default function Recordings() {
 
   const handleDeleteAll = async () => {
     if (!window.confirm("Are you sure you want to delete ALL recordings?")) return;
+
     try {
-      const res = await fetch(`http://localhost:5000/api/recordings`, { 
+      const res = await fetch(`${BACKEND_URL}/api/recordings`, {
         method: "DELETE",
         headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        }, });
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
       const data = await res.json();
       if (data.success) {
         setRecordings([]);
@@ -71,7 +76,9 @@ export default function Recordings() {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <div className="p-4 max-w-5xl mx-auto w-full">
-        <h2 className="text-2xl font-semibold mb-4 text-center md:text-left">Your Recordings</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center md:text-left">
+          Your Recordings
+        </h2>
 
         {recordings.length > 0 && (
           <div className="flex justify-center md:justify-end mb-4">
@@ -93,7 +100,7 @@ export default function Recordings() {
                 key={rec._id}
                 className="relative bg-white/10 p-3 rounded-lg shadow-md flex flex-col"
               >
-                {/* Delete button top-right */}
+                {/* Delete button */}
                 <button
                   onClick={() => handleDelete(rec._id)}
                   className="absolute top-2 right-2 p-1 bg-white/20 rounded-full hover:bg-red-200 transition z-10"
@@ -104,7 +111,9 @@ export default function Recordings() {
 
                 {/* Video */}
                 <video
-                  src={`http://localhost:5000/api/recordings/${rec._id}?token=${localStorage.getItem("token")}`}
+                  src={`${BACKEND_URL}/api/recordings/${rec._id}?token=${localStorage.getItem(
+                    "token"
+                  )}`}
                   controls
                   className="w-full rounded-lg max-h-[250px] sm:max-h-[300px] md:max-h-[250px] lg:max-h-[200px] object-cover"
                 />

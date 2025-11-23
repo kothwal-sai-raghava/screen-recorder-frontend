@@ -13,16 +13,15 @@ export default function Home() {
   const streamRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
 
-
   const showRecordings = () => navigate("/recordings", { state: { refresh: true } });
 
   useEffect(() => {
     let interval;
-    if (isRecording) {
+    if (isRecording && !isPaused) {
       interval = setInterval(() => setSeconds((s) => s + 1), 1000);
     }
     return () => clearInterval(interval);
-  }, [isRecording,isPaused]);
+  }, [isRecording, isPaused]);
 
   const startRecording = async () => {
     try {
@@ -43,11 +42,11 @@ export default function Home() {
       };
 
       recorder.start();
-setMediaRecorder(recorder);
-setSeconds(0);
-setIsRecording(true);
-setIsPaused(false);
-
+      setMediaRecorder(recorder);
+      setSeconds(0);
+      setIsRecording(true);
+      setIsPaused(false);
+      
     } catch (err) {
       console.log(err.message);
       toast.error("Failed to start recording");
@@ -57,22 +56,22 @@ setIsPaused(false);
   const pauseRecording = () => {
     if (!mediaRecorder) return;
 
-  if (!isPaused) {
-    mediaRecorder.pause();
-    setIsPaused(true);
-  } else {
-    mediaRecorder.resume();
-    setIsPaused(false);
-  }
+    if (!isPaused) {
+      mediaRecorder.pause();
+      setIsPaused(true);
+    } else {
+      mediaRecorder.resume();
+      setIsPaused(false);
+    }
   };
 
   const stopRecording = () => {
     if (!mediaRecorder) return;
 
-  mediaRecorder.stop();
-  streamRef.current?.getTracks().forEach(track => track.stop());
-  setIsRecording(false);
-  setIsPaused(false);
+    mediaRecorder.stop();
+    streamRef.current?.getTracks().forEach(track => track.stop());
+    setIsRecording(false);
+    setIsPaused(false);
   };
 
   const uploadVideo = async (file) => {
@@ -81,7 +80,7 @@ setIsPaused(false);
     chunksRef.current = [];
 
     try {
-      const res = await fetch(`http://localhost:5000/api/recordings`, {
+      const res = await fetch(`https://screen-recorder-backend-8ujt.onrender.com/api/recordings`, {
         method: "POST",
         body: formData,
         headers: {
@@ -162,13 +161,14 @@ setIsPaused(false);
             ⏱ {String(Math.floor(seconds / 60)).padStart(2, "0")}:
             {String(seconds % 60).padStart(2, "0")}
           </span>
+
           <button onClick={pauseRecording} className="hover:scale-110 transition">
-  {isPaused ? (
-    <Play className="h-5 w-5 text-green-400" />
-  ) : (
-    <Pause className="h-5 w-5 text-yellow-400" />
-  )}
-</button>
+            {isPaused ? (
+              <Play className="h-5 w-5 text-green-400" />
+            ) : (
+              <Pause className="h-5 w-5 text-yellow-400" />
+            )}
+          </button>
 
           <button onClick={stopRecording} className="hover:scale-110 transition">
             <Square className="h-5 w-5 text-red-500" />
