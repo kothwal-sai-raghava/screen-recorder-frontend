@@ -9,9 +9,6 @@ export default function Navbar() {
         <Link to="/" className="hover:text-blue-400 transition">
           Home
         </Link>
-        <Link to="/profile" className="hover:text-blue-400 transition">
-          Profile
-        </Link>
         <Link to="/recordings" className="hover:text-blue-400 transition">
           Recordings
         </Link>
